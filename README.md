@@ -48,9 +48,9 @@ python -m streamlit run app.py
 ## Features
 
 - Overview of virtual device status, events, and alert severity.
+- Dashboard buttons to simulate normal telemetry, failed logins, traffic spikes,
+  and unknown destinations for a selected online device.
 - Add virtual devices using validated IPv4 addresses and change their status.
-- Generate normal telemetry, failed logins, traffic spikes, and unknown
-  destinations for a selected online device.
 - Adjust the failed-login count and simulated packet-size thresholds.
 - See immediate feedback after each simulation, including generated security
   alerts and confirmation that the event was saved.

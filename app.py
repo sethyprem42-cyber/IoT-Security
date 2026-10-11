@@ -50,37 +50,7 @@ packet_size_limit = st.sidebar.number_input(
     step=500,
 )
 
-st.sidebar.divider()
-st.sidebar.subheader("Simulate an event")
 devices = read_table("devices")
-online_devices = devices.loc[
-    devices["status"] == "Online", "name"
-].tolist()
-if online_devices:
-    target_device = st.sidebar.selectbox("Target virtual device", online_devices)
-    for scenario, button_label in zip(
-        EVENT_TYPES,
-        [
-            "Simulate Normal Telemetry",
-            "Simulate Failed Login",
-            "Simulate Traffic Spike",
-            "Simulate Unknown Destination",
-        ],
-    ):
-        if st.sidebar.button(button_label, use_container_width=True):
-            try:
-                st.session_state["last_simulation"] = generate_event(
-                    scenario,
-                    target_device,
-                    int(failed_login_limit),
-                    int(packet_size_limit),
-                )
-            except DeviceUnavailableError as exc:
-                st.sidebar.error(str(exc))
-            st.rerun()
-else:
-    st.sidebar.warning("Activate a virtual device before simulating events.")
-
 st.title("🔐 Virtual Security Monitoring System")
 st.subheader("Main Security Dashboard" if page == "Main Dashboard" else page)
 st.caption(
@@ -126,6 +96,46 @@ metric_columns[3].metric(
 )
 
 if page == "Main Dashboard":
+    st.markdown("#### Event simulation")
+    online_devices = devices.loc[
+        devices["status"] == "Online", "name"
+    ].tolist()
+    if online_devices:
+        target_device = st.selectbox(
+            "Target virtual device",
+            online_devices,
+            key="simulation_target_device",
+        )
+        button_labels = [
+            "Simulate Normal Telemetry",
+            "Simulate Failed Login",
+            "Simulate Traffic Spike",
+            "Simulate Unknown Destination",
+        ]
+        simulation_columns = st.columns(4)
+        for column, scenario, button_label in zip(
+            simulation_columns,
+            EVENT_TYPES,
+            button_labels,
+        ):
+            if column.button(button_label, use_container_width=True):
+                try:
+                    st.session_state["last_simulation"] = generate_event(
+                        scenario,
+                        target_device,
+                        int(failed_login_limit),
+                        int(packet_size_limit),
+                    )
+                except DeviceUnavailableError as exc:
+                    st.session_state["simulation_error"] = str(exc)
+                st.rerun()
+    else:
+        st.warning("Activate a virtual device before simulating events.")
+
+    simulation_error = st.session_state.pop("simulation_error", None)
+    if simulation_error:
+        st.error(simulation_error)
+
     st.markdown("#### Security overview")
     chart_column, alert_column = st.columns(2)
     with chart_column:
@@ -143,7 +153,7 @@ if page == "Main Dashboard":
     with alert_column:
         st.markdown("#### Alert severity")
         if alerts.empty:
-            st.success("No alerts recorded. Use the sidebar to simulate activity.")
+            st.success("No security alerts have been recorded.")
         else:
             severity_counts = (
                 alerts["severity"]
