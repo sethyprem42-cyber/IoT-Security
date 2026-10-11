@@ -49,6 +49,22 @@ def init_db(db_path=DB_PATH):
     with database(db_path) as con:
         con.execute(
             """
+            CREATE TABLE IF NOT EXISTS detection_policy (
+                id INTEGER PRIMARY KEY CHECK (id = 1),
+                failed_login_limit INTEGER NOT NULL,
+                packet_size_limit INTEGER NOT NULL
+            )
+            """
+        )
+        con.execute(
+            """
+            INSERT OR IGNORE INTO detection_policy
+            (id, failed_login_limit, packet_size_limit)
+            VALUES (1, 3, 1500)
+            """
+        )
+        con.execute(
+            """
             CREATE TABLE IF NOT EXISTS devices (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT UNIQUE NOT NULL,
@@ -99,6 +115,48 @@ def init_db(db_path=DB_PATH):
                     ("Energy Meter", "Meter", "192.168.1.14", "Offline"),
                 ],
             )
+
+
+def load_detection_policy(db_path=DB_PATH):
+    with database(db_path) as con:
+        row = con.execute(
+            """
+            SELECT failed_login_limit, packet_size_limit
+            FROM detection_policy
+            WHERE id = 1
+            """
+        ).fetchone()
+    if row is None:
+        raise RuntimeError("Detection policy is missing from the database.")
+    return {
+        "failed_login_limit": row[0],
+        "packet_size_limit": row[1],
+    }
+
+
+def save_detection_policy(failed_login_limit, packet_size_limit, db_path=DB_PATH):
+    if (
+        not isinstance(failed_login_limit, int)
+        or not 2 <= failed_login_limit <= 20
+    ):
+        raise ValueError("Failed-login threshold must be between 2 and 20.")
+    if (
+        not isinstance(packet_size_limit, int)
+        or not 500 <= packet_size_limit <= 20000
+        or packet_size_limit % 500 != 0
+    ):
+        raise ValueError(
+            "Packet-size limit must be a 500-byte increment between 500 and 20000."
+        )
+    with database(db_path) as con:
+        con.execute(
+            """
+            UPDATE detection_policy
+            SET failed_login_limit = ?, packet_size_limit = ?
+            WHERE id = 1
+            """,
+            (failed_login_limit, packet_size_limit),
+        )
 
 
 def read_table(table, db_path=DB_PATH):

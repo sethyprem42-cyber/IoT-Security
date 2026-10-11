@@ -10,7 +10,9 @@ from security_core import (
     add_device,
     generate_event,
     init_db,
+    load_detection_policy,
     read_table,
+    save_detection_policy,
     update_device_status,
 )
 
@@ -35,6 +37,41 @@ class SecurityCoreTests(unittest.TestCase):
     def test_initialization_seeds_devices_once(self):
         init_db(self.db_path)
         self.assertEqual(len(read_table("devices", self.db_path)), 5)
+
+    def test_detection_policy_defaults_and_persists(self):
+        self.assertEqual(
+            load_detection_policy(self.db_path),
+            {"failed_login_limit": 3, "packet_size_limit": 1500},
+        )
+        save_detection_policy(5, 2500, self.db_path)
+        self.assertEqual(
+            load_detection_policy(self.db_path),
+            {"failed_login_limit": 5, "packet_size_limit": 2500},
+        )
+        init_db(self.db_path)
+        self.assertEqual(
+            load_detection_policy(self.db_path),
+            {"failed_login_limit": 5, "packet_size_limit": 2500},
+        )
+
+    def test_detection_policy_rejects_out_of_range_values(self):
+        for failed_login_limit, packet_size_limit in (
+            (1, 1500),
+            (21, 1500),
+            (3, 499),
+            (3, 750),
+            (3, 20500),
+        ):
+            with self.subTest(
+                failed_login_limit=failed_login_limit,
+                packet_size_limit=packet_size_limit,
+            ):
+                with self.assertRaises(ValueError):
+                    save_detection_policy(
+                        failed_login_limit,
+                        packet_size_limit,
+                        self.db_path,
+                    )
 
     def test_normal_event_is_stored_without_alert(self):
         event = generate_event(

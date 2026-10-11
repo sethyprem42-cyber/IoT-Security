@@ -13,7 +13,9 @@ from security_core import (
     add_device,
     generate_event,
     init_db,
+    load_detection_policy,
     read_table,
+    save_detection_policy,
     update_device_status,
 )
 
@@ -25,6 +27,7 @@ st.set_page_config(
 )
 
 init_db()
+saved_policy = load_detection_policy()
 
 st.sidebar.title("🔐 Security Center")
 st.sidebar.caption("Software-only security simulator")
@@ -35,20 +38,28 @@ page = st.sidebar.radio(
 
 st.sidebar.divider()
 st.sidebar.subheader("Detection policy")
-failed_login_limit = st.sidebar.number_input(
-    "Failed logins per device in 15 minutes",
-    min_value=2,
-    max_value=20,
-    value=3,
-    step=1,
-)
-packet_size_limit = st.sidebar.number_input(
-    "Maximum packet size (bytes)",
-    min_value=500,
-    max_value=20000,
-    value=1500,
-    step=500,
-)
+with st.sidebar.form("detection_policy_form"):
+    failed_login_limit = st.number_input(
+        "Failed logins per device in 15 minutes",
+        min_value=2,
+        max_value=20,
+        value=saved_policy["failed_login_limit"],
+        step=1,
+    )
+    packet_size_limit = st.number_input(
+        "Maximum packet size (bytes)",
+        min_value=500,
+        max_value=20000,
+        value=saved_policy["packet_size_limit"],
+        step=500,
+    )
+    save_policy = st.form_submit_button("Save detection policy")
+if save_policy:
+    save_detection_policy(int(failed_login_limit), int(packet_size_limit))
+    st.session_state["policy_saved"] = True
+    st.rerun()
+if st.session_state.pop("policy_saved", False):
+    st.sidebar.success("Detection policy saved.")
 
 devices = read_table("devices")
 st.title("🔐 Virtual Security Monitoring System")

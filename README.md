@@ -51,7 +51,8 @@ python -m streamlit run app.py
 - Dashboard buttons to simulate normal telemetry, failed logins, traffic spikes,
   and unknown destinations for a selected online device.
 - Add virtual devices using validated IPv4 addresses and change their status.
-- Adjust the failed-login count and simulated packet-size thresholds.
+- Adjust and save the failed-login count and simulated packet-size thresholds;
+  policy settings persist in SQLite across restarts.
 - See immediate feedback after each simulation, including generated security
   alerts and confirmation that the event was saved.
 - Automatically record and classify synthetic events and alerts in SQLite.
@@ -79,7 +80,8 @@ Tests use temporary databases and do not modify your local dashboard database.
 ## Project files
 
 - `app.py` — Streamlit user interface.
-- `security_core.py` — SQLite persistence, input validation, and detection rules.
+- `security_core.py` — SQLite persistence, saved policy settings, input
+  validation, and detection rules.
 - `tests/` — isolated unit tests for the persistence and detection logic.
 - `.github/workflows/tests.yml` — automated tests on pushes and pull requests.
 
