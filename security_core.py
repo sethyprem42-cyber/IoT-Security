@@ -243,7 +243,7 @@ def generate_event(
             message = "The device contacted an unapproved simulated destination."
 
         severity = "LOW"
-        alert_message = None
+        alert_message = "Low-severity alert: simulated activity was recorded."
 
         if destination not in DESTINATION_ALLOWLIST:
             severity = "HIGH"

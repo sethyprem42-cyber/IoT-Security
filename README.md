@@ -63,9 +63,10 @@ The default SQLite database is created in the `data` folder when the app first
 runs. Database files are intentionally excluded from Git; each local
 installation keeps its own event history.
 
-Normal telemetry is recorded without generating a security alert when it is
-within policy. Simulated failed logins, traffic spikes that exceed the selected
-packet-size limit, and unknown destinations generate alerts.
+Every simulated event generates a database-backed alert. Normal telemetry
+generates a LOW alert, traffic spikes above the selected packet-size limit
+generate MEDIUM alerts, unknown destinations generate HIGH alerts, and
+repeated failed logins can generate CRITICAL alerts.
 
 ## Run tests
 

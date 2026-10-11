@@ -86,7 +86,7 @@ if last_simulation:
     elif last_simulation["severity"] == "MEDIUM":
         st.warning(f"MEDIUM security alert: {last_simulation['alert_message']}")
     else:
-        st.info("No security alert was triggered; the simulated event met policy.")
+        st.info(f"LOW security alert: {last_simulation['alert_message']}")
 
 devices = read_table("devices")
 events = read_table("events")

@@ -73,7 +73,7 @@ class SecurityCoreTests(unittest.TestCase):
                         self.db_path,
                     )
 
-    def test_normal_event_is_stored_without_alert(self):
+    def test_normal_event_is_stored_with_low_severity_alert(self):
         event = generate_event(
             "Normal telemetry",
             "Smart Camera",
@@ -84,9 +84,11 @@ class SecurityCoreTests(unittest.TestCase):
             rng=FixedRandom(250),
         )
         self.assertEqual(event["severity"], "LOW")
-        self.assertIsNone(event["alert_message"])
+        self.assertIsNotNone(event["alert_message"])
         self.assertEqual(len(read_table("events", self.db_path)), 1)
-        self.assertTrue(read_table("alerts", self.db_path).empty)
+        alerts = read_table("alerts", self.db_path)
+        self.assertEqual(len(alerts), 1)
+        self.assertEqual(alerts.iloc[0]["severity"], "LOW")
 
     def test_traffic_above_limit_creates_medium_alert(self):
         event = generate_event(
