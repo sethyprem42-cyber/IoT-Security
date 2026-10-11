@@ -1,0 +1,89 @@
+# Virtual IoT Security Simulator
+
+A local Streamlit application for practicing basic IoT security monitoring with
+synthetic events and virtual devices. It stores device inventory, events, and
+alerts in a local SQLite database.
+
+> **Important:** This is an educational simulator. It does not capture network
+> traffic, inspect or control physical devices, block connections, or provide
+> production security protection.
+
+## Requirements
+
+- Python 3.10 or newer
+- pip
+
+## Run on Windows
+
+Open PowerShell in the project directory and run:
+
+```powershell
+py -m venv .venv
+.\.venv\Scripts\Activate.ps1
+py -m pip install -r requirements.txt
+py -m streamlit run app.py
+```
+
+Open the local URL printed in the terminal (usually
+`http://localhost:8501`). Keep the terminal open while using the dashboard.
+Press `Ctrl+C` in the terminal to stop the server.
+
+If PowerShell blocks environment activation, skip activation and use the Python
+launcher directly:
+
+```powershell
+py -m pip install -r requirements.txt
+py -m streamlit run app.py
+```
+
+## Run on macOS or Linux
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+python -m streamlit run app.py
+```
+
+## Features
+
+- Overview of virtual device status, events, and alert severity.
+- Add virtual devices using validated IPv4 addresses and change their status.
+- Generate normal telemetry, failed logins, traffic spikes, and unknown
+  destinations for a selected online device.
+- Adjust the failed-login count and simulated packet-size thresholds.
+- Automatically record and classify synthetic events and alerts.
+- Filter event history and download the filtered events as CSV.
+- Acknowledge pending alerts.
+
+The default SQLite database is created at `data/iot_security.db` when the app
+first runs. Database files are intentionally excluded from Git; each local
+installation keeps its own event history.
+
+## Run tests
+
+Install the app dependencies, then run:
+
+```powershell
+py -m unittest discover -s tests -v
+```
+
+Tests use temporary databases and do not modify your local dashboard database.
+
+## Project files
+
+- `app.py` — Streamlit user interface.
+- `security_core.py` — SQLite persistence, input validation, and detection rules.
+- `tests/` — isolated unit tests for the persistence and detection logic.
+- `.github/workflows/tests.yml` — automated tests on pushes and pull requests.
+
+## GitHub
+
+The public repository is
+[sethyprem42-cyber/IoT-Security](https://github.com/sethyprem42-cyber/IoT-Security).
+Clone it with:
+
+```bash
+git clone https://github.com/sethyprem42-cyber/IoT-Security.git
+cd IoT-Security
+```
