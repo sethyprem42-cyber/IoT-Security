@@ -52,13 +52,19 @@ python -m streamlit run app.py
 - Generate normal telemetry, failed logins, traffic spikes, and unknown
   destinations for a selected online device.
 - Adjust the failed-login count and simulated packet-size thresholds.
-- Automatically record and classify synthetic events and alerts.
-- Filter event history and download the filtered events as CSV.
+- See immediate feedback after each simulation, including generated security
+  alerts and confirmation that the event was saved.
+- Automatically record and classify synthetic events and alerts in SQLite.
+- Review and filter the complete event history and download it as CSV.
 - Acknowledge pending alerts.
 
 The default SQLite database is created at `data/iot_security.db` when the app
 first runs. Database files are intentionally excluded from Git; each local
 installation keeps its own event history.
+
+Normal telemetry is recorded without generating a security alert when it is
+within policy. Simulated failed logins, traffic spikes that exceed the selected
+packet-size limit, and unknown destinations generate alerts.
 
 ## Run tests
 

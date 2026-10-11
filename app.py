@@ -30,7 +30,7 @@ st.sidebar.title("🔐 Security Center")
 st.sidebar.caption("Software-only IoT security simulator")
 page = st.sidebar.radio(
     "Navigate",
-    ["Overview", "Devices", "Event Log", "Alerts"],
+    ["Main Dashboard", "Devices", "Event History", "Alerts"],
 )
 
 st.sidebar.divider()
@@ -58,10 +58,18 @@ online_devices = devices.loc[
 ].tolist()
 if online_devices:
     target_device = st.sidebar.selectbox("Target virtual device", online_devices)
-    for scenario in EVENT_TYPES:
-        if st.sidebar.button(scenario, use_container_width=True):
+    for scenario, button_label in zip(
+        EVENT_TYPES,
+        [
+            "Simulate Normal Telemetry",
+            "Simulate Failed Login",
+            "Simulate Traffic Spike",
+            "Simulate Unknown Destination",
+        ],
+    ):
+        if st.sidebar.button(button_label, use_container_width=True):
             try:
-                generate_event(
+                st.session_state["last_simulation"] = generate_event(
                     scenario,
                     target_device,
                     int(failed_login_limit),
@@ -74,6 +82,7 @@ else:
     st.sidebar.warning("Activate a virtual device before simulating events.")
 
 st.title("🔐 Virtual IoT Security Monitoring System")
+st.subheader("Main Security Dashboard" if page == "Main Dashboard" else page)
 st.caption(
     "Synthetic events only · Local SQLite storage · "
     f"Updated {datetime.now().strftime('%d %b %Y, %H:%M:%S')}"
@@ -82,6 +91,21 @@ st.info(
     "This educational simulator does not capture real network traffic, "
     "monitor real devices, or block connections."
 )
+
+last_simulation = st.session_state.pop("last_simulation", None)
+if last_simulation:
+    st.success(
+        f"{last_simulation['event_type']} recorded for {last_simulation['device']} "
+        "in the SQLite event history."
+    )
+    if last_simulation["severity"] == "CRITICAL":
+        st.error(f"CRITICAL security alert: {last_simulation['alert_message']}")
+    elif last_simulation["severity"] == "HIGH":
+        st.error(f"HIGH security alert: {last_simulation['alert_message']}")
+    elif last_simulation["severity"] == "MEDIUM":
+        st.warning(f"MEDIUM security alert: {last_simulation['alert_message']}")
+    else:
+        st.info("No security alert was triggered; the simulated event met policy.")
 
 devices = read_table("devices")
 events = read_table("events")
@@ -101,8 +125,8 @@ metric_columns[3].metric(
     delta_color="inverse",
 )
 
-if page == "Overview":
-    st.subheader("Security overview")
+if page == "Main Dashboard":
+    st.markdown("#### Security overview")
     chart_column, alert_column = st.columns(2)
     with chart_column:
         st.markdown("#### Device status")
@@ -174,8 +198,8 @@ elif page == "Devices":
         except sqlite3.IntegrityError:
             st.error("A device with that name already exists.")
 
-elif page == "Event Log":
-    st.subheader("Security event log")
+elif page == "Event History":
+    st.markdown("#### Security event history")
     if events.empty:
         st.info("No events recorded yet. Generate an event from the sidebar.")
     else:
