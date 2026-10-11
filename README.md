@@ -1,6 +1,6 @@
-# Virtual IoT Security Simulator
+# Virtual Security Simulator
 
-A local Streamlit application for practicing basic IoT security monitoring with
+A local Streamlit application for practicing cybersecurity monitoring with
 synthetic events and virtual devices. It stores device inventory, events, and
 alerts in a local SQLite database.
 
@@ -58,8 +58,8 @@ python -m streamlit run app.py
 - Review and filter the complete event history and download it as CSV.
 - Acknowledge pending alerts.
 
-The default SQLite database is created at `data/iot_security.db` when the app
-first runs. Database files are intentionally excluded from Git; each local
+The default SQLite database is created in the `data` folder when the app first
+runs. Database files are intentionally excluded from Git; each local
 installation keeps its own event history.
 
 Normal telemetry is recorded without generating a security alert when it is
@@ -85,11 +85,5 @@ Tests use temporary databases and do not modify your local dashboard database.
 
 ## GitHub
 
-The public repository is
-[sethyprem42-cyber/IoT-Security](https://github.com/sethyprem42-cyber/IoT-Security).
-Clone it with:
-
-```bash
-git clone https://github.com/sethyprem42-cyber/IoT-Security.git
-cd IoT-Security
-```
+The public source repository is hosted on
+[GitHub](https://github.com/sethyprem42-cyber/IoT-Security).

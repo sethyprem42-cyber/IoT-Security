@@ -1,4 +1,4 @@
-"""Database and synthetic detection logic for the IoT security simulator."""
+"""Database and synthetic detection logic for the security simulator."""
 
 import ipaddress
 import random

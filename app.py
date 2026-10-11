@@ -19,7 +19,7 @@ from security_core import (
 
 
 st.set_page_config(
-    page_title="Virtual IoT Security",
+    page_title="Virtual Security Simulator",
     page_icon="🔐",
     layout="wide",
 )
@@ -27,7 +27,7 @@ st.set_page_config(
 init_db()
 
 st.sidebar.title("🔐 Security Center")
-st.sidebar.caption("Software-only IoT security simulator")
+st.sidebar.caption("Software-only security simulator")
 page = st.sidebar.radio(
     "Navigate",
     ["Main Dashboard", "Devices", "Event History", "Alerts"],
@@ -81,7 +81,7 @@ if online_devices:
 else:
     st.sidebar.warning("Activate a virtual device before simulating events.")
 
-st.title("🔐 Virtual IoT Security Monitoring System")
+st.title("🔐 Virtual Security Monitoring System")
 st.subheader("Main Security Dashboard" if page == "Main Dashboard" else page)
 st.caption(
     "Synthetic events only · Local SQLite storage · "
@@ -225,7 +225,7 @@ elif page == "Event History":
         st.download_button(
             "Download filtered events as CSV",
             data=filtered_events.to_csv(index=False).encode("utf-8"),
-            file_name="iot_security_events.csv",
+            file_name="security_events.csv",
             mime="text/csv",
         )
         chart_events = events.copy()
